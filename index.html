@@ -6,108 +6,108 @@
 
 <title>推し育成アプリ</title>
 
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff5c8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f2f2f7;
+body{
+  margin:0;
+  font-family:-apple-system;
+  background:#f2f2f7;
+}
+
+/* 起動画面 */
+#splash{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#ff5c8a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+  font-size:24px;
+  z-index:9999;
+  transition:0.5s;
 }
 
 /* 画面 */
-.screen {
-  display: none;
-  height: 100vh;
-  overflow-y: auto;
-}
-.active {
-  display: block;
-}
+.screen{display:none;height:100vh;overflow-y:auto;}
+.active{display:block;}
 
 /* 一覧 */
-#grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  padding: 10px;
+#grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:10px;
 }
 
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 10px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.card{
+  background:white;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
 }
 
-.card img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 12px;
+.card img{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:12px;
 }
 
 /* 詳細 */
-#detail {
-  padding: 14px;
-  text-align: center;
-}
-
-#petImage {
-  width: 160px;
-  height: 160px;
-  border-radius: 18px;
-  object-fit: cover;
-  margin: 10px 0;
+#detail{text-align:center;padding:14px;}
+#petImage{
+  width:160px;height:160px;
+  border-radius:16px;
+  object-fit:cover;
 }
 
 /* ボタン */
-button {
-  background: #ff5c8a;
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 8px;
-  width: 100%;
-}
-
-/* input */
-input {
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  width: 90%;
-  margin-top: 6px;
+button{
+  width:100%;
+  margin-top:8px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#ff5c8a;
+  color:white;
 }
 
 /* 追加ボタン */
-#addBtn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 28px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+#addBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  font-size:26px;
 }
 
-/* エフェクト */
-.floatEmoji {
-  position: absolute;
-  font-size: 24px;
-  animation: floatUp 1s ease-out forwards;
-  pointer-events: none;
+/* エモート */
+.floatEmoji{
+  position:absolute;
+  font-size:24px;
+  animation:float 1s forwards;
 }
-
-@keyframes floatUp {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-60px); }
+@keyframes float{
+  0%{opacity:1;transform:translateY(0);}
+  100%{opacity:0;transform:translateY(-60px);}
 }
 </style>
 </head>
 
 <body>
+
+<!-- 起動 -->
+<div id="splash">推し育成アプリ</div>
 
 <!-- 一覧 -->
 <div id="listScreen" class="screen active">
@@ -131,14 +131,12 @@ input {
     <input id="nameInput" placeholder="名前">
     <button onclick="changeName()">名前変更</button>
 
-    <!-- ⭐ 画像選択（これが消えてた原因） -->
     <input type="file" accept="image/*" onchange="changeImage(event)">
 
     <button onclick="back()">戻る</button>
   </div>
 </div>
 
-<!-- 追加 -->
 <button id="addBtn" onclick="addPet()">＋</button>
 
 <script>
@@ -150,136 +148,132 @@ function save(){
 }
 
 /* 初期 */
-if(pets.length === 0){
-  pets.push({
-    name:"りん",
-    food:100,
-    love:100,
-    start:Date.now(),
-    image:""
-  });
+if(pets.length===0){
+  pets.push({name:"りん",food:100,love:100,start:Date.now(),image:""});
   save();
 }
 
-/* 画面切替 */
+/* 画面 */
 function showList(){
-  document.getElementById("listScreen").classList.add("active");
-  document.getElementById("detailScreen").classList.remove("active");
+  listScreen.classList.add("active");
+  detailScreen.classList.remove("active");
 }
-
 function showDetail(){
-  document.getElementById("listScreen").classList.remove("active");
-  document.getElementById("detailScreen").classList.add("active");
+  listScreen.classList.remove("active");
+  detailScreen.classList.add("active");
 }
 
 /* 追加 */
 function addPet(){
-  pets.push({
-    name:"なまえ未設定",
-    food:100,
-    love:100,
-    start:Date.now(),
-    image:""
-  });
-  save();
-  render();
+  pets.push({name:"なまえ未設定",food:100,love:100,start:Date.now(),image:""});
+  save();render();
 }
 
 /* 選択 */
 function selectPet(i){
-  current = i;
+  current=i;
   showDetail();
   render();
 }
 
 /* 操作 */
 function feed(){
-  pets[current].food = Math.min(100, pets[current].food + 10);
-  save(); render();
-  spawnEmoji("😋");
+  pets[current].food=Math.min(100,pets[current].food+10);
+  save();render();
+  emoji("😋");
 }
-
 function loveUp(){
-  pets[current].love = Math.min(100, pets[current].love + 10);
-  save(); render();
-  spawnEmoji("💕");
+  pets[current].love=Math.min(100,pets[current].love+10);
+  save();render();
+  emoji("💕");
 }
-
 function changeName(){
-  pets[current].name = document.getElementById("nameInput").value;
-  save(); render();
+  pets[current].name=nameInput.value;
+  save();render();
 }
 
+/* ⭐ 画像軽量化（iPhone対策） */
 function changeImage(e){
-  const r = new FileReader();
-  r.onload = function(){
-    pets[current].image = r.result;
-    save();
-    render();
-  }
-  r.readAsDataURL(e.target.files[0]);
+  const file=e.target.files[0];
+  const img=new Image();
+  const reader=new FileReader();
+
+  reader.onload=e=>img.src=e.target.result;
+
+  img.onload=()=>{
+    const canvas=document.createElement("canvas");
+    const ctx=canvas.getContext("2d");
+
+    const max=300;
+    let w=img.width,h=img.height;
+
+    if(w>h && w>max){h*=max/w;w=max;}
+    else if(h>max){w*=max/h;h=max;}
+
+    canvas.width=w;canvas.height=h;
+    ctx.drawImage(img,0,0,w,h);
+
+    pets[current].image=canvas.toDataURL("image/jpeg",0.7);
+    save();render();
+  };
+
+  reader.readAsDataURL(file);
 }
 
-function back(){
-  showList();
-}
+function back(){showList();}
 
 /* 表示 */
 function render(){
+  grid.innerHTML=pets.map((p,i)=>`
+    <div class="card" onclick="selectPet(${i})">
+      <img src="${p.image||''}">
+      <b>${p.name}</b>
+      <div>🍚${p.food}% 💗${p.love}%</div>
+    </div>`).join("");
 
-  let grid = "";
+  let p=pets[current];
+  if(!p)return;
 
-  pets.forEach((p,i)=>{
-    grid += `
-      <div class="card" onclick="selectPet(${i})">
-        <img src="${p.image || ''}">
-        <b>${p.name}</b>
-        <div>🍚${p.food}% 💗${p.love}%</div>
-      </div>
-    `;
-  });
+  name.innerText=p.name;
+  food.innerText=p.food;
+  love.innerText=p.love;
+  petImage.src=p.image||"";
 
-  document.getElementById("grid").innerHTML = grid;
-
-  let p = pets[current];
-  if(!p) return;
-
-  document.getElementById("name").innerText = p.name;
-  document.getElementById("food").innerText = p.food;
-  document.getElementById("love").innerText = p.love;
-  document.getElementById("petImage").src = p.image || "";
-
-  let days = Math.floor((Date.now()-p.start)/(1000*60*60*24));
-  document.getElementById("days").innerText = days;
+  days.innerText=Math.floor((Date.now()-p.start)/(1000*60*60*24));
 }
 
-/* 放置減少 */
+/* 放置 */
 setInterval(()=>{
   pets.forEach(p=>{
-    p.food = Math.max(0, p.food - 1);
-    p.love = Math.max(0, p.love - 1);
+    p.food=Math.max(0,p.food-1);
+    p.love=Math.max(0,p.love-1);
   });
-  save();
-  render();
-}, 1000 * 60 * 10);
+  save();render();
+},600000);
 
 /* エモート */
-function spawnEmoji(text){
-  const img = document.getElementById("petImage");
-  if(!img) return;
-
-  const rect = img.getBoundingClientRect();
-
-  const el = document.createElement("div");
-  el.className = "floatEmoji";
-  el.innerText = text;
-
-  el.style.left = (rect.left + rect.width/2) + "px";
-  el.style.top = (rect.top + window.scrollY) + "px";
-
+function emoji(t){
+  const r=petImage.getBoundingClientRect();
+  const el=document.createElement("div");
+  el.className="floatEmoji";
+  el.innerText=t;
+  el.style.left=(r.left+r.width/2)+"px";
+  el.style.top=(r.top+scrollY)+"px";
   document.body.appendChild(el);
-
   setTimeout(()=>el.remove(),1000);
+}
+
+/* 起動 */
+window.onload=()=>{
+  setTimeout(()=>{
+    splash.style.opacity=0;
+    setTimeout(()=>splash.remove(),500);
+  },1500);
+};
+
+/* PWA */
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register('service-worker.js');
 }
 
 render();
