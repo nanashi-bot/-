@@ -9,71 +9,120 @@
 <link rel="manifest" href="manifest.json">
 
 <style>
+/* ===== 全体 ===== */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  display: flex;
-  height: 100vh;
   background: #f2f2f7;
+  height: 100vh;
+  display: flex;
   overflow: hidden;
 }
 
+/* ===== 左：一覧 ===== */
 #list {
-  width: 40%;
-  background: #ffffffaa;
+  width: 38%;
+  min-width: 120px;
+  background: #ffffffcc;
   backdrop-filter: blur(10px);
   overflow-y: auto;
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border-right: 1px solid #ddd;
 }
 
+/* カード */
 .petCard {
   background: white;
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: pointer;
+  user-select: none;
 }
 
 .petCard img {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 10px;
   object-fit: cover;
 }
 
+/* ===== 右：詳細 ===== */
 #detail {
   flex: 1;
-  padding: 15px;
+  padding: 14px;
   overflow-y: auto;
   background: #fff;
 }
 
-img#petImage {
-  width: 140px;
-  height: 140px;
+/* メイン画像 */
+#petImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
   object-fit: cover;
-  border-radius: 18px;
+  margin-top: 8px;
 }
 
+/* テキスト */
+h2 {
+  margin: 0 0 6px 0;
+}
+
+/* ボタン */
 button {
-  margin: 4px;
-  padding: 10px 14px;
+  margin: 6px 4px;
+  padding: 12px 14px;
   border-radius: 12px;
   border: none;
   background: #ff5c8a;
   color: white;
+  font-size: 14px;
+  touch-action: manipulation;
 }
 
+/* input */
 input {
-  padding: 6px;
-  border-radius: 8px;
+  width: 90%;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 10px;
   border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* ===== スマホ最適化 ===== */
+@media (max-width: 768px) {
+
+  body {
+    flex-direction: column;
+  }
+
+  #list {
+    width: 100%;
+    height: 40%;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+  }
+
+  .petCard {
+    min-width: 160px;
+    flex-shrink: 0;
+  }
+
+  #detail {
+    height: 60%;
+  }
 }
 </style>
 </head>
@@ -83,23 +132,25 @@ input {
 <div id="list"></div>
 
 <div id="detail">
-<h2 id="name">未選択</h2>
-<p>出会って <span id="days">0</span> 日</p>
+  <h2 id="name">未選択</h2>
+  <p>出会って <span id="days">0</span> 日</p>
 
-<img id="petImage">
+  <img id="petImage">
 
-<h3>🍚 <span id="food"></span>%</h3>
-<h3>💗 <span id="love"></span>%</h3>
+  <h3>🍚 <span id="food"></span>%</h3>
+  <h3>💗 <span id="love"></span>%</h3>
 
-<button onclick="feed()">ご飯</button>
-<button onclick="loveUp()">愛でる</button>
+  <button onclick="feed()">ご飯</button>
+  <button onclick="loveUp()">愛でる</button>
 
-<br><br>
-<input id="nameInput" placeholder="名前">
-<button onclick="changeName()">変更</button>
+  <br><br>
 
-<br><br>
-<input type="file" onchange="changeImage(event)">
+  <input id="nameInput" placeholder="名前">
+  <button onclick="changeName()">変更</button>
+
+  <br><br>
+
+  <input type="file" onchange="changeImage(event)">
 </div>
 
 <script>
@@ -110,6 +161,7 @@ function save(){
   localStorage.setItem("pets", JSON.stringify(pets));
 }
 
+/* 初期データ */
 if(pets.length === 0){
   pets.push({
     name:"りん",
@@ -151,17 +203,19 @@ function changeImage(e){
 }
 
 function render(){
+
   let listHTML = "";
 
   pets.forEach((p,i)=>{
     listHTML += `
-    <div class="petCard" onclick="selectPet(${i})">
-      <img src="${p.image || ''}">
-      <div>
-        <b>${p.name}</b><br>
-        🍚${p.food}% 💗${p.love}%
+      <div class="petCard" onclick="selectPet(${i})">
+        <img src="${p.image || ''}">
+        <div>
+          <b>${p.name}</b><br>
+          🍚${p.food}% 💗${p.love}%
+        </div>
       </div>
-    </div>`;
+    `;
   });
 
   document.getElementById("list").innerHTML = listHTML;
