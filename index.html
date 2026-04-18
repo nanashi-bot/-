@@ -3,34 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
 <title>推し観察アプリ</title>
+
+<link rel="manifest" href="manifest.json">
 
 <style>
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
   height: 100vh;
   background: #f2f2f7;
   overflow: hidden;
 }
 
-/* 一覧 */
 #list {
-  height: 100vh;
+  width: 40%;
+  background: #ffffffaa;
+  backdrop-filter: blur(10px);
   overflow-y: auto;
   padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #ffffffaa;
-  backdrop-filter: blur(10px);
 }
 
-/* カード */
 .petCard {
   background: white;
   border-radius: 16px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -39,40 +41,33 @@ body {
 }
 
 .petCard img {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
   object-fit: cover;
 }
 
-/* 詳細 */
 #detail {
-  display: none;
-  height: 100vh;
+  flex: 1;
   padding: 15px;
-  background: white;
   overflow-y: auto;
+  background: #fff;
 }
 
 img#petImage {
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   object-fit: cover;
   border-radius: 18px;
 }
 
-/* ボタン */
 button {
-  margin: 5px;
+  margin: 4px;
   padding: 10px 14px;
   border-radius: 12px;
   border: none;
   background: #ff5c8a;
   color: white;
-}
-
-button:active {
-  transform: scale(0.95);
 }
 
 input {
@@ -85,16 +80,10 @@ input {
 
 <body>
 
-<!-- 🌿一覧 -->
 <div id="list"></div>
 
-<!-- 🌸詳細 -->
 <div id="detail">
-
-<button onclick="backToList()">←戻る</button>
-
-<h2 id="name"></h2>
-
+<h2 id="name">未選択</h2>
 <p>出会って <span id="days">0</span> 日</p>
 
 <img id="petImage">
@@ -106,72 +95,37 @@ input {
 <button onclick="loveUp()">愛でる</button>
 
 <br><br>
-
 <input id="nameInput" placeholder="名前">
 <button onclick="changeName()">変更</button>
 
 <br><br>
 <input type="file" onchange="changeImage(event)">
-
 </div>
 
 <script>
 let pets = JSON.parse(localStorage.getItem("pets")) || [];
 let current = 0;
-let mode = "list";
-
-const bgList = [
-  "linear-gradient(#ffe4ec,#fff)",
-  "linear-gradient(#e0f7ff,#fff)",
-  "linear-gradient(#fff0d6,#fff)",
-  "#ffffff"
-];
 
 function save(){
   localStorage.setItem("pets", JSON.stringify(pets));
 }
 
-/* 初期データ */
 if(pets.length === 0){
   pets.push({
     name:"りん",
     food:100,
     love:100,
     start:Date.now(),
-    image:"",
-    bg:bgList[0]
+    image:""
   });
   save();
 }
 
-/* 追加 */
-function addPet(){
-  pets.push({
-    name:"新しい子",
-    food:100,
-    love:100,
-    start:Date.now(),
-    image:"",
-    bg:bgList[Math.floor(Math.random()*bgList.length)]
-  });
-  save();
-  render();
-}
-
-/* 開く */
-function openPet(i){
+function selectPet(i){
   current = i;
-  mode = "detail";
   render();
 }
 
-/* 戻る */
-function backToList(){
-  mode = "list";
-  render();
-}
-
-/* 操作 */
 function feed(){
   pets[current].food = Math.min(100, pets[current].food + 10);
   save(); render();
@@ -196,58 +150,40 @@ function changeImage(e){
   r.readAsDataURL(e.target.files[0]);
 }
 
-/* 表示 */
 function render(){
+  let listHTML = "";
 
-  if(mode === "list"){
-    let html = "";
+  pets.forEach((p,i)=>{
+    listHTML += `
+    <div class="petCard" onclick="selectPet(${i})">
+      <img src="${p.image || ''}">
+      <div>
+        <b>${p.name}</b><br>
+        🍚${p.food}% 💗${p.love}%
+      </div>
+    </div>`;
+  });
 
-    pets.forEach((p,i)=>{
-      html += `
-      <div class="petCard" onclick="openPet(${i})">
-        <img src="${p.image || ''}">
-        <div>
-          <b>${p.name}</b><br>
-          🍚${Math.floor(p.food)}% 💗${Math.floor(p.love)}%
-        </div>
-      </div>`;
-    });
+  document.getElementById("list").innerHTML = listHTML;
 
-    html += `<button onclick="addPet()">＋新しい子を追加</button>`;
+  let p = pets[current];
+  if(!p) return;
 
-    document.getElementById("list").innerHTML = html;
-    document.getElementById("list").style.display = "flex";
-    document.getElementById("detail").style.display = "none";
-  }
+  document.getElementById("name").innerText = p.name;
+  document.getElementById("food").innerText = p.food;
+  document.getElementById("love").innerText = p.love;
+  document.getElementById("petImage").src = p.image || "";
 
-  if(mode === "detail"){
-    let p = pets[current];
-
-    document.getElementById("list").style.display = "none";
-    document.getElementById("detail").style.display = "block";
-
-    document.getElementById("name").innerText = p.name;
-    document.getElementById("food").innerText = Math.floor(p.food);
-    document.getElementById("love").innerText = Math.floor(p.love);
-    document.getElementById("petImage").src = p.image || "";
-
-    let days = Math.floor((Date.now()-p.start)/(1000*60*60*24));
-    document.getElementById("days").innerText = days;
-  }
+  let days = Math.floor((Date.now()-p.start)/(1000*60*60*24));
+  document.getElementById("days").innerText = days;
 }
 
-/* 減少 */
-setInterval(()=>{
-  pets.forEach(p=>{
-    p.food = Math.max(0, p.food - 1);
-    p.love = Math.max(0, p.love - 1);
-  });
-  save();
-  render();
-}, 300000);
-
-/* 起動 */
 render();
+
+/* PWA */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
 </script>
 
 </body>
