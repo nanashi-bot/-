@@ -4,154 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-<title>推し観察アプリ</title>
-
-<link rel="manifest" href="manifest.json">
+<title>推し育成ゲーム</title>
 
 <style>
-/* ===== 全体 ===== */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background: #f2f2f7;
+}
+
+/* ===== 画面切替 ===== */
+.screen {
+  display: none;
   height: 100vh;
-  display: flex;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
-/* ===== 左：一覧 ===== */
-#list {
-  width: 38%;
-  min-width: 120px;
-  background: #ffffffcc;
-  backdrop-filter: blur(10px);
-  overflow-y: auto;
+.active {
+  display: block;
+}
+
+/* ===== 一覧 ===== */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border-right: 1px solid #ddd;
 }
 
-/* カード */
-.petCard {
+.card {
   background: white;
-  border-radius: 14px;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  cursor: pointer;
-  user-select: none;
-}
-
-.petCard img {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-/* ===== 右：詳細 ===== */
-#detail {
-  flex: 1;
-  padding: 14px;
-  overflow-y: auto;
-  background: #fff;
-}
-
-/* メイン画像 */
-#petImage {
-  width: 120px;
-  height: 120px;
   border-radius: 16px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card img {
+  width: 100%;
+  height: 120px;
   object-fit: cover;
-  margin-top: 8px;
-}
-
-/* テキスト */
-h2 {
-  margin: 0 0 6px 0;
-}
-
-/* ボタン */
-button {
-  margin: 6px 4px;
-  padding: 12px 14px;
   border-radius: 12px;
-  border: none;
+}
+
+/* ===== ボタン ===== */
+button {
   background: #ff5c8a;
   color: white;
-  font-size: 14px;
-  touch-action: manipulation;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 8px;
+  width: 100%;
 }
 
-/* input */
+/* ===== 詳細 ===== */
+#detail {
+  padding: 14px;
+  text-align: center;
+}
+
+#petImage {
+  width: 160px;
+  height: 160px;
+  border-radius: 18px;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
 input {
-  width: 90%;
-  margin-top: 6px;
   padding: 8px;
   border-radius: 10px;
   border: 1px solid #ddd;
-  font-size: 14px;
+  width: 90%;
+  margin-top: 6px;
 }
 
-/* ===== スマホ最適化 ===== */
-@media (max-width: 768px) {
-
-  body {
-    flex-direction: column;
-  }
-
-  #list {
-    width: 100%;
-    height: 40%;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-right: none;
-    border-bottom: 1px solid #ddd;
-    white-space: nowrap;
-  }
-
-  .petCard {
-    min-width: 160px;
-    flex-shrink: 0;
-  }
-
-  #detail {
-    height: 60%;
-  }
+/* ===== 追加ボタン固定 ===== */
+#addBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 28px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 </style>
 </head>
 
 <body>
 
-<div id="list"></div>
-
-<div id="detail">
-  <h2 id="name">未選択</h2>
-  <p>出会って <span id="days">0</span> 日</p>
-
-  <img id="petImage">
-
-  <h3>🍚 <span id="food"></span>%</h3>
-  <h3>💗 <span id="love"></span>%</h3>
-
-  <button onclick="feed()">ご飯</button>
-  <button onclick="loveUp()">愛でる</button>
-
-  <br><br>
-
-  <input id="nameInput" placeholder="名前">
-  <button onclick="changeName()">変更</button>
-
-  <br><br>
-
-  <input type="file" onchange="changeImage(event)">
+<!-- ===== 一覧画面 ===== -->
+<div id="listScreen" class="screen active">
+  <div id="grid"></div>
 </div>
+
+<!-- ===== 詳細画面 ===== -->
+<div id="detailScreen" class="screen">
+  <div id="detail">
+    <h2 id="name"></h2>
+    <p>出会って <span id="days"></span> 日</p>
+
+    <img id="petImage">
+
+    <h3>🍚 <span id="food"></span>%</h3>
+    <h3>💗 <span id="love"></span>%</h3>
+
+    <button onclick="feed()">ご飯</button>
+    <button onclick="loveUp()">愛でる</button>
+
+    <input id="nameInput" placeholder="名前">
+    <button onclick="changeName()">名前変更</button>
+
+    <button onclick="back()">戻る</button>
+  </div>
+</div>
+
+<!-- ===== 追加ボタン ===== -->
+<button id="addBtn" onclick="addPet()">＋</button>
 
 <script>
 let pets = JSON.parse(localStorage.getItem("pets")) || [];
@@ -161,7 +133,6 @@ function save(){
   localStorage.setItem("pets", JSON.stringify(pets));
 }
 
-/* 初期データ */
 if(pets.length === 0){
   pets.push({
     name:"りん",
@@ -173,11 +144,39 @@ if(pets.length === 0){
   save();
 }
 
-function selectPet(i){
-  current = i;
+/* ===== 画面切替 ===== */
+function showList(){
+  document.getElementById("listScreen").classList.add("active");
+  document.getElementById("detailScreen").classList.remove("active");
   render();
 }
 
+function showDetail(){
+  document.getElementById("listScreen").classList.remove("active");
+  document.getElementById("detailScreen").classList.add("active");
+}
+
+/* ===== 追加 ===== */
+function addPet(){
+  pets.push({
+    name:"なまえ未設定",
+    food:100,
+    love:100,
+    start:Date.now(),
+    image:""
+  });
+  save();
+  render();
+}
+
+/* ===== 選択 ===== */
+function selectPet(i){
+  current = i;
+  showDetail();
+  render();
+}
+
+/* ===== 操作 ===== */
 function feed(){
   pets[current].food = Math.min(100, pets[current].food + 10);
   save(); render();
@@ -193,32 +192,26 @@ function changeName(){
   save(); render();
 }
 
-function changeImage(e){
-  let r = new FileReader();
-  r.onload = function(){
-    pets[current].image = r.result;
-    save(); render();
-  }
-  r.readAsDataURL(e.target.files[0]);
+function back(){
+  showList();
 }
 
+/* ===== 表示 ===== */
 function render(){
 
-  let listHTML = "";
+  let grid = "";
 
   pets.forEach((p,i)=>{
-    listHTML += `
-      <div class="petCard" onclick="selectPet(${i})">
+    grid += `
+      <div class="card" onclick="selectPet(${i})">
         <img src="${p.image || ''}">
-        <div>
-          <b>${p.name}</b><br>
-          🍚${p.food}% 💗${p.love}%
-        </div>
+        <b>${p.name}</b>
+        <div>🍚${p.food}% 💗${p.love}%</div>
       </div>
     `;
   });
 
-  document.getElementById("list").innerHTML = listHTML;
+  document.getElementById("grid").innerHTML = grid;
 
   let p = pets[current];
   if(!p) return;
@@ -233,11 +226,6 @@ function render(){
 }
 
 render();
-
-/* PWA */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
 </script>
 
 </body>
