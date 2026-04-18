@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-<title>推し育成ゲーム</title>
+<title>推し育成アプリ</title>
 
 <style>
 body {
@@ -13,18 +13,17 @@ body {
   background: #f2f2f7;
 }
 
-/* ===== 画面 ===== */
+/* 画面 */
 .screen {
   display: none;
   height: 100vh;
   overflow-y: auto;
 }
-
 .active {
   display: block;
 }
 
-/* ===== 一覧（2列） ===== */
+/* 一覧 */
 #grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -47,7 +46,7 @@ body {
   border-radius: 12px;
 }
 
-/* ===== 詳細 ===== */
+/* 詳細 */
 #detail {
   padding: 14px;
   text-align: center;
@@ -61,7 +60,7 @@ body {
   margin: 10px 0;
 }
 
-/* ===== ボタン ===== */
+/* ボタン */
 button {
   background: #ff5c8a;
   color: white;
@@ -70,10 +69,9 @@ button {
   border-radius: 12px;
   margin-top: 8px;
   width: 100%;
-  font-size: 14px;
 }
 
-/* ===== input ===== */
+/* input */
 input {
   padding: 8px;
   border-radius: 10px;
@@ -82,7 +80,7 @@ input {
   margin-top: 6px;
 }
 
-/* ===== 追加ボタン ===== */
+/* 追加ボタン */
 #addBtn {
   position: fixed;
   bottom: 20px;
@@ -94,7 +92,7 @@ input {
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* ===== エモート演出 ===== */
+/* エフェクト */
 .floatEmoji {
   position: absolute;
   font-size: 24px;
@@ -103,14 +101,8 @@ input {
 }
 
 @keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-60px);
-  }
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-60px); }
 }
 </style>
 </head>
@@ -139,6 +131,9 @@ input {
     <input id="nameInput" placeholder="名前">
     <button onclick="changeName()">名前変更</button>
 
+    <!-- ⭐ 画像選択（これが消えてた原因） -->
+    <input type="file" accept="image/*" onchange="changeImage(event)">
+
     <button onclick="back()">戻る</button>
   </div>
 </div>
@@ -166,11 +161,10 @@ if(pets.length === 0){
   save();
 }
 
-/* ===== 画面切替 ===== */
+/* 画面切替 */
 function showList(){
   document.getElementById("listScreen").classList.add("active");
   document.getElementById("detailScreen").classList.remove("active");
-  render();
 }
 
 function showDetail(){
@@ -178,7 +172,7 @@ function showDetail(){
   document.getElementById("detailScreen").classList.add("active");
 }
 
-/* ===== 追加 ===== */
+/* 追加 */
 function addPet(){
   pets.push({
     name:"なまえ未設定",
@@ -191,14 +185,14 @@ function addPet(){
   render();
 }
 
-/* ===== 選択 ===== */
+/* 選択 */
 function selectPet(i){
   current = i;
   showDetail();
   render();
 }
 
-/* ===== 操作 ===== */
+/* 操作 */
 function feed(){
   pets[current].food = Math.min(100, pets[current].food + 10);
   save(); render();
@@ -216,11 +210,21 @@ function changeName(){
   save(); render();
 }
 
+function changeImage(e){
+  const r = new FileReader();
+  r.onload = function(){
+    pets[current].image = r.result;
+    save();
+    render();
+  }
+  r.readAsDataURL(e.target.files[0]);
+}
+
 function back(){
   showList();
 }
 
-/* ===== 表示 ===== */
+/* 表示 */
 function render(){
 
   let grid = "";
@@ -249,9 +253,9 @@ function render(){
   document.getElementById("days").innerText = days;
 }
 
-/* ===== 放置減少（10分ごと） ===== */
-setInterval(() => {
-  pets.forEach(p => {
+/* 放置減少 */
+setInterval(()=>{
+  pets.forEach(p=>{
     p.food = Math.max(0, p.food - 1);
     p.love = Math.max(0, p.love - 1);
   });
@@ -259,7 +263,7 @@ setInterval(() => {
   render();
 }, 1000 * 60 * 10);
 
-/* ===== エモート ===== */
+/* エモート */
 function spawnEmoji(text){
   const img = document.getElementById("petImage");
   if(!img) return;
@@ -270,7 +274,16 @@ function spawnEmoji(text){
   el.className = "floatEmoji";
   el.innerText = text;
 
-  el.style.left = (rect.left + rect.width / 2) + "px";
+  el.style.left = (rect.left + rect.width/2) + "px";
   el.style.top = (rect.top + window.scrollY) + "px";
 
   document.body.appendChild(el);
+
+  setTimeout(()=>el.remove(),1000);
+}
+
+render();
+</script>
+
+</body>
+</html>
